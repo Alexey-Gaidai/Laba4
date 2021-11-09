@@ -20,6 +20,7 @@ namespace Laba4
     {
         public static List<double> steps = new List<double>();//список точек
         public double[] sss;
+        public string[,] list;
 
         private static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
         private const string SpreadsheetId = "1Kcvpqi-I6wY0HSFGehgdVp_tS70Fk2KQroZT39Z8S5Q";
@@ -61,6 +62,46 @@ namespace Laba4
 
         }
 
+        private void ExportExcel()//получение точек из эксель
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.DefaultExt = "*.xls;*.xlsx";
+            ofd.Filter = "файл Excel (Spisok.xlsx)|*.xlsx";
+            ofd.Title = "Выберите файл базы данных";
+
+            if (!(ofd.ShowDialog() == DialogResult.OK))
+                MessageBox.Show("", "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            Excel.Application ObjWorkExcel = new Excel.Application();
+            Excel.Workbook ObjWorkBook = ObjWorkExcel.Workbooks.Open(ofd.FileName);
+            Excel.Worksheet ObjWorkSheet = (Excel.Worksheet)ObjWorkBook.Sheets[1];
+
+            var lastCell = ObjWorkSheet.Cells.SpecialCells(Excel.XlCellType.xlCellTypeLastCell);
+            int lastColumn = (int)lastCell.Column;
+            int lastRow = (int)lastCell.Row;
+            if (lastRow <= 2)
+            {
+                MessageBox.Show("Недостаточное количество точек", "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                list = new string[lastRow, lastColumn];
+
+                for (int j = 0; j < 1; j++)
+                    for (int i = 0; i < lastRow; i++)
+                        list[i, j] = ObjWorkSheet.Cells[i + 1, j + 1].Text.ToString();
+            }
+
+            ObjWorkBook.Close(false, Type.Missing, Type.Missing);
+            ObjWorkExcel.Quit();
+            ObjWorkExcel.Quit();
+            GC.Collect();
+        }
+
+
+
+
+
         async private void button4_Click(object sender, EventArgs e)
         {
             try
@@ -91,8 +132,27 @@ namespace Laba4
             Series series1 = new Series();
             series1.ChartType = SeriesChartType.Column;
             chart1.Series.Add(series1);
-            for (int i = 0; i < steps.Count; i++)
+            for (int i = 0; i < sss.GetLength(0); i++)
                 chart1.Series[0].Points.Add(sss[i]);//отрисовка
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ExportExcel();
+                sss = new double[list.GetLength(0)];
+                for (int i = 0; i < list.GetLength(0); i++)
+                {
+                    sss[i] = Convert.ToDouble(list[i,0]);
+                    dataGridView1.Rows.Add(sss[i]);
+                }
+                BuildChart(0, sss.GetLength(0) + 1, 1);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
