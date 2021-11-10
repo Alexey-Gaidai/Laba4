@@ -20,7 +20,11 @@ namespace Laba4
     public partial class Form1 : Form
     {
         public static List<double> steps = new List<double>();//список точек
-        public double[] sss;
+        public static double[] array1;
+        public static double[] array2;
+        public static double[] array3;
+        public static double[] array4;
+        public static double[] array5;
         public string[,] list;
 
         private static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
@@ -53,12 +57,19 @@ namespace Laba4
                 Console.WriteLine("No data found.");
                 return;
             }
-            sss = new double[values.Count];
+            array1 = new double[values.Count];
+            array2 = new double[values.Count];
+            array3 = new double[values.Count];
+            array4 = new double[values.Count];
+            array5 = new double[values.Count];
             for (int i = 0; i < values.Count; i++)
             {
                 double val0 = Convert.ToDouble(values[i][0]);
-                steps.Add(val0);
-                sss[i] = val0;
+                array1[i] = val0;
+                array2[i] = val0;
+                array3[i] = val0;
+                array4[i] = val0;
+                array5[i] = val0;
             }
 
         }
@@ -109,9 +120,9 @@ namespace Laba4
             {
                 var serviceValues = GetSheetsService().Spreadsheets.Values;
                 await ReadAsync(serviceValues);
-                for (int i = 0; i < steps.Count; i++)
+                for (int i = 0; i < array1.GetLength(0); i++)
                 {
-                    dataGridView1.Rows.Add(sss[i]);
+                    dataGridView1.Rows.Add(array1[i]);
                 }
                 //BuildChart(0, steps.Count+1, 1);
             }
@@ -133,8 +144,8 @@ namespace Laba4
             Series series1 = new Series();
             series1.ChartType = SeriesChartType.Column;
             chart1.Series.Add(series1);
-            for (int i = 0; i < sss.GetLength(0); i++)
-                chart1.Series[0].Points.Add(sss[i]);//отрисовка
+            for (int i = 0; i < array1.GetLength(0); i++)
+                chart1.Series[0].Points.Add(array1[i]);//отрисовка
             chart1.Update();
         }
 
@@ -143,13 +154,13 @@ namespace Laba4
             try
             {
                 ExportExcel();
-                sss = new double[list.GetLength(0)];
+                array1 = new double[list.GetLength(0)];
                 for (int i = 0; i < list.GetLength(0); i++)
                 {
-                    sss[i] = Convert.ToDouble(list[i,0]);
-                    dataGridView1.Rows.Add(sss[i]);
+                    array1[i] = Convert.ToDouble(list[i,0]);
+                    dataGridView1.Rows.Add(array1[i]);
                 }
-                BuildChart(0, sss.GetLength(0) + 1, 1);
+                BuildChart(0, array1.GetLength(0) + 1, 1);
             }
             catch (Exception ex)
             {
@@ -161,48 +172,61 @@ namespace Laba4
         {
             if(checkBox1.Checked == true)
             {
-                sss = await method(sss);
+                Thread bubble = new Thread(new ParameterizedThreadStart(BubbleSort));
+                bubble.Start(array1);
             }
             if(checkBox2.Checked == true)
             {
-                sss = InsertSort(sss);
-                BuildChart(0, sss.GetLength(0) + 1, 1);
+                Thread Insert = new Thread(new ParameterizedThreadStart(InsertSort));
+                Insert.Start(array2);
             }
 
         }
 
-        async Task<Double[]> method(double[] arr)//асинхроним расчеты метода
+        /*async Task<Double[]> bubble(double[] arr)//асинхроним расчеты метода
         {
             var result = await Task.Run(() => BubbleSort(arr));
             return result;
-        }
+        }*/
 
-        public void addchart(Chart chart1)
+        /*async Task<Double[]> insert(double[] arr)//асинхроним расчеты метода
         {
-            groupBox1.Controls.Add(chart1);
-        }
+            var result = await Task.Run(() => InsertSort(arr));
+            return result;
+        }*/
 
-        public double[] BubbleSort(double[] arr)
+        public void addchart(Chart chart)
         {
+            groupBox1.Controls.Add(chart);
+        }
+        
+
+        public void BubbleSort(object arr1)
+        {
+            double[] arr = (double[])arr1;
             Chart chart1 = new Chart();
-            
             ChartArea area = new ChartArea();
+            chart1.Size = new System.Drawing.Size(290, 210);
+            chart1.Location = new System.Drawing.Point(6, 19);
             area.AxisX.Minimum = 0;
             area.AxisX.Maximum = arr.Length+1;
             area.AxisX.MajorGrid.Enabled = true;
             chart1.ChartAreas.Add(area);
-            Series series1 = new Series();
+            Series series1 = new Series("Сортировка пузырьком");
             series1.ChartType = SeriesChartType.Column;
+            series1.Legend = "Legend1";
             chart1.Series.Add(series1);
             for (int i = 0; i < arr.GetLength(0); i++)
-                chart1.Series[0].Points.Add(arr[i]);//отрисовка
+                chart1.Series[0].Points.Add(arr[i]);
             Action action2 = () => chart1.Update();
             Invoke(action2);
-            Action action = () => addchart(chart1);//так как этот метод находится в другом потоке то вызываем через инвоук
+            Action action = () => addchart(chart1);
             Invoke(action);
             double temp;
-            Thread.Sleep(3000);
+            Thread.Sleep(500);
 
+            System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+            timer.Start();
             for (int i = 0; i<arr.Length; ++i)
             {
                 for (int j = i + 1; j<arr.Length; ++j)
@@ -214,20 +238,44 @@ namespace Laba4
                         arr[j] = temp;
                         Action action3 = () => chart1.Series[0].Points.Clear();
                         Invoke(action3);
-                        for (int k = 0; k < sss.GetLength(0); k++)
+                        for (int k = 0; k < arr.GetLength(0); k++)
                         {
                             Action action4 = () => chart1.Series[0].Points.Add(arr[k]);
                             Invoke(action4);
                         }
-                        Thread.Sleep(1000);
+                        Thread.Sleep(500);
                     }
-}
+                }
             }
-            return arr;
+            timer.Stop();
+            Action action5 = () => label2.Text = timer.ToString();
+            Invoke(action5);
+            //return arr;
         }
 
-        public double[] InsertSort(double[] arr)
+        public void InsertSort(object arr1)
         {
+            double[] arr = (double[])arr1;
+            Chart chart2 = new Chart();
+            ChartArea area = new ChartArea();
+            chart2.Size = new System.Drawing.Size(290, 210);
+            chart2.Location = new System.Drawing.Point(298, 19);
+            area.AxisX.Minimum = 0;
+            area.AxisX.Maximum = arr.Length + 1;
+            area.AxisX.MajorGrid.Enabled = true;
+            chart2.ChartAreas.Add(area);
+            Series series1 = new Series("Сортировка пузырьком");
+            series1.ChartType = SeriesChartType.Column;
+            series1.Legend = "Legend1";
+            chart2.Series.Add(series1);
+            for (int i = 0; i < arr.GetLength(0); i++)
+                chart2.Series[0].Points.Add(arr[i]);
+            Action action = () => addchart(chart2);
+            Invoke(action);
+            Action action2 = () => chart2.Update();
+            Invoke(action2);
+            Thread.Sleep(500);
+
             for (int i = 1; i<arr.Length; ++i)
             {
                 double key = arr[i];
@@ -239,8 +287,16 @@ namespace Laba4
                     --j;
                 }
                  arr[j + 1] = key;
+                Action action3 = () => chart2.Series[0].Points.Clear();
+                Invoke(action3);
+                for (int k = 0; k < arr.GetLength(0); k++)
+                {
+                    Action action4 = () => chart2.Series[0].Points.Add(arr[k]);
+                    Invoke(action4);
+                }
+                Thread.Sleep(500);
             }
-            return arr;
+            //return arr;
         }
     }
 }

@@ -47,6 +47,7 @@ namespace Laba4
             this.button4 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -68,7 +69,7 @@ namespace Laba4
             this.очиститьToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(979, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -139,9 +140,9 @@ namespace Laba4
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1});
-            this.dataGridView1.Location = new System.Drawing.Point(649, 185);
+            this.dataGridView1.Location = new System.Drawing.Point(828, 326);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(139, 366);
+            this.dataGridView1.Size = new System.Drawing.Size(139, 543);
             this.dataGridView1.TabIndex = 8;
             // 
             // Column1
@@ -151,14 +152,14 @@ namespace Laba4
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(649, 563);
+            this.textBox1.Location = new System.Drawing.Point(828, 195);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(32, 20);
             this.textBox1.TabIndex = 9;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(682, 557);
+            this.button2.Location = new System.Drawing.Point(861, 189);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(106, 31);
             this.button2.TabIndex = 10;
@@ -167,7 +168,7 @@ namespace Laba4
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(649, 594);
+            this.button3.Location = new System.Drawing.Point(828, 226);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(139, 31);
             this.button3.TabIndex = 11;
@@ -177,14 +178,14 @@ namespace Laba4
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(670, 668);
+            this.textBox2.Location = new System.Drawing.Point(849, 300);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(118, 20);
             this.textBox2.TabIndex = 12;
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(649, 631);
+            this.button4.Location = new System.Drawing.Point(828, 263);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(139, 31);
             this.button4.TabIndex = 13;
@@ -195,7 +196,7 @@ namespace Laba4
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(649, 671);
+            this.label1.Location = new System.Drawing.Point(825, 303);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(21, 13);
             this.label1.TabIndex = 14;
@@ -205,27 +206,37 @@ namespace Laba4
             // 
             this.groupBox1.Location = new System.Drawing.Point(12, 185);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(628, 499);
+            this.groupBox1.Size = new System.Drawing.Size(810, 692);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "groupBox1";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(176, 27);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(35, 13);
+            this.label2.TabIndex = 16;
+            this.label2.Text = "label2";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 699);
+            this.ClientSize = new System.Drawing.Size(979, 881);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.checkBox5);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.checkBox4);
+            this.Controls.Add(this.textBox2);
             this.Controls.Add(this.checkBox3);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.button1);
@@ -261,6 +272,7 @@ namespace Laba4
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label2;
     }
 }
 
