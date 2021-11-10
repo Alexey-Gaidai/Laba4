@@ -203,9 +203,9 @@ namespace Laba4
             // 
             // groupBox1
             // 
-            this.groupBox1.Location = new System.Drawing.Point(13, 185);
+            this.groupBox1.Location = new System.Drawing.Point(12, 185);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(630, 499);
+            this.groupBox1.Size = new System.Drawing.Size(628, 499);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "groupBox1";

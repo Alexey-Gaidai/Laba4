@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using System.IO;
 using Google.Apis.Auth.OAuth2;
@@ -123,7 +124,7 @@ namespace Laba4
         void BuildChart(double x_min, double x_max, double dx)
         {
             Chart chart1 = new Chart();
-            groupBox1.Controls.Add(chart1);
+            //groupBox1.Controls.Add(chart1);
             ChartArea area = new ChartArea();
             area.AxisX.Minimum = x_min;
             area.AxisX.Maximum = x_max;
@@ -156,20 +157,51 @@ namespace Laba4
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        async private void button1_Click(object sender, EventArgs e)
         {
             if(checkBox1.Checked == true)
             {
-                sss = BubbleSort(sss);
+                sss = await method(sss);
+            }
+            if(checkBox2.Checked == true)
+            {
+                sss = InsertSort(sss);
                 BuildChart(0, sss.GetLength(0) + 1, 1);
             }
 
         }
 
+        async Task<Double[]> method(double[] arr)//асинхроним расчеты метода
+        {
+            var result = await Task.Run(() => BubbleSort(arr));
+            return result;
+        }
+
+        public void addchart(Chart chart1)
+        {
+            groupBox1.Controls.Add(chart1);
+        }
 
         public double[] BubbleSort(double[] arr)
         {
+            Chart chart1 = new Chart();
+            
+            ChartArea area = new ChartArea();
+            area.AxisX.Minimum = 0;
+            area.AxisX.Maximum = arr.Length+1;
+            area.AxisX.MajorGrid.Enabled = true;
+            chart1.ChartAreas.Add(area);
+            Series series1 = new Series();
+            series1.ChartType = SeriesChartType.Column;
+            chart1.Series.Add(series1);
+            for (int i = 0; i < arr.GetLength(0); i++)
+                chart1.Series[0].Points.Add(arr[i]);//отрисовка
+            Action action2 = () => chart1.Update();
+            Invoke(action2);
+            Action action = () => addchart(chart1);//так как этот метод находится в другом потоке то вызываем через инвоук
+            Invoke(action);
             double temp;
+            Thread.Sleep(3000);
 
             for (int i = 0; i<arr.Length; ++i)
             {
@@ -180,8 +212,33 @@ namespace Laba4
                         temp = arr[i];
                         arr[i] = arr[j];
                         arr[j] = temp;
+                        Action action3 = () => chart1.Series[0].Points.Clear();
+                        Invoke(action3);
+                        for (int k = 0; k < sss.GetLength(0); k++)
+                        {
+                            Action action4 = () => chart1.Series[0].Points.Add(arr[k]);
+                            Invoke(action4);
+                        }
+                        Thread.Sleep(1000);
                     }
 }
+            }
+            return arr;
+        }
+
+        public double[] InsertSort(double[] arr)
+        {
+            for (int i = 1; i<arr.Length; ++i)
+            {
+                double key = arr[i];
+                int j = i - 1;
+
+                while (j >= 0 && arr[j] > key)
+                {
+                    arr[j + 1] = arr[j];
+                    --j;
+                }
+                 arr[j + 1] = key;
             }
             return arr;
         }
