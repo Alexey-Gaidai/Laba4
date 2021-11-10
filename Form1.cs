@@ -112,7 +112,7 @@ namespace Laba4
                 {
                     dataGridView1.Rows.Add(sss[i]);
                 }
-                BuildChart(0, steps.Count+1, 1);
+                //BuildChart(0, steps.Count+1, 1);
             }
             catch (Exception ex)
             {
@@ -134,6 +134,7 @@ namespace Laba4
             chart1.Series.Add(series1);
             for (int i = 0; i < sss.GetLength(0); i++)
                 chart1.Series[0].Points.Add(sss[i]);//отрисовка
+            chart1.Update();
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -153,6 +154,36 @@ namespace Laba4
             {
                 MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if(checkBox1.Checked == true)
+            {
+                sss = BubbleSort(sss);
+                BuildChart(0, sss.GetLength(0) + 1, 1);
+            }
+
+        }
+
+
+        public double[] BubbleSort(double[] arr)
+        {
+            double temp;
+
+            for (int i = 0; i<arr.Length; ++i)
+            {
+                for (int j = i + 1; j<arr.Length; ++j)
+                {
+                    if (arr[i] > arr[j])
+                    {
+                        temp = arr[i];
+                        arr[i] = arr[j];
+                        arr[j] = temp;
+                    }
+}
+            }
+            return arr;
         }
     }
 }
