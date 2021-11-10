@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -180,6 +181,11 @@ namespace Laba4
                 Thread Insert = new Thread(new ParameterizedThreadStart(InsertSort));
                 Insert.Start(array2);
             }
+            if(checkBox5.Checked == true)
+            {
+                Thread Bogo = new Thread(new ParameterizedThreadStart(BogoSort));
+                Bogo.Start(array5);
+            }
 
         }
 
@@ -225,8 +231,8 @@ namespace Laba4
             double temp;
             Thread.Sleep(500);
 
-            System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-            timer.Start();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             for (int i = 0; i<arr.Length; ++i)
             {
                 for (int j = i + 1; j<arr.Length; ++j)
@@ -247,8 +253,9 @@ namespace Laba4
                     }
                 }
             }
-            timer.Stop();
-            Action action5 = () => label2.Text = timer.ToString();
+            sw.Stop();
+            double aaa = sw.ElapsedMilliseconds / 1000;
+            Action action5 = () => label2.Text = aaa.ToString();
             Invoke(action5);
             //return arr;
         }
@@ -276,6 +283,9 @@ namespace Laba4
             Invoke(action2);
             Thread.Sleep(500);
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
             for (int i = 1; i<arr.Length; ++i)
             {
                 double key = arr[i];
@@ -296,7 +306,84 @@ namespace Laba4
                 }
                 Thread.Sleep(500);
             }
+            sw.Stop();
+            double aaa = sw.ElapsedMilliseconds / 1000;
+            Action action5 = () => label3.Text = aaa.ToString();
+            Invoke(action5);
             //return arr;
+        }
+
+
+        public void BogoSort(object arr1)
+        {
+            double[] arr = (double[])arr1;
+            Chart chart2 = new Chart();
+            ChartArea area = new ChartArea();
+            chart2.Size = new System.Drawing.Size(290, 210);
+            chart2.Location = new System.Drawing.Point(8, 229);
+            area.AxisX.Minimum = 0;
+            area.AxisX.Maximum = arr.Length + 1;
+            area.AxisX.MajorGrid.Enabled = true;
+            chart2.ChartAreas.Add(area);
+            Series series1 = new Series("Сортировка пузырьком");
+            series1.ChartType = SeriesChartType.Column;
+            series1.Legend = "Legend1";
+            chart2.Series.Add(series1);
+            for (int i = 0; i < arr.GetLength(0); i++)
+                chart2.Series[0].Points.Add(arr[i]);
+            Action action = () => addchart(chart2);
+            Invoke(action);
+            Action action2 = () => chart2.Update();
+            Invoke(action2);
+            Thread.Sleep(500);
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            while (!IsSorted(arr))
+            {
+                arr = RandomSwap(arr);
+                Action action3 = () => chart2.Series[0].Points.Clear();
+                Invoke(action3);
+                for (int k = 0; k < arr.GetLength(0); k++)
+                {
+                    Action action4 = () => chart2.Series[0].Points.Add(arr[k]);
+                    Invoke(action4);
+                }
+                Thread.Sleep(500);
+            }
+            sw.Stop();
+            double aaa = sw.ElapsedMilliseconds / 1000;
+            Action action5 = () => label4.Text = aaa.ToString();
+            Invoke(action5);
+        }
+        public static bool IsSorted(double[] arr)
+        {
+            for (int i = 0; i < arr.Length - 1; i++)
+            {
+                if (arr[i] > arr[i + 1])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public static double[] RandomSwap(double[] arr)
+        {   
+            Random random = new Random();
+            var n = arr.Length;
+            while (n > 1)
+            {
+                --n;
+                var i = random.Next(n + 1);
+                var temp = arr[i];
+                arr[i] = arr[n];
+                arr[n] = temp;
+            }
+
+            return arr;
         }
     }
 }
