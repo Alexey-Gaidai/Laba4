@@ -63,11 +63,6 @@ namespace Laba4
                 Console.WriteLine("No data found.");
                 return;
             }
-            /*array1 = new double[values.Count];
-            array2 = new double[values.Count];
-            array3 = new double[values.Count];
-            array4 = new double[values.Count];
-            array5 = new double[values.Count];*/
             for (int i = 0; i < values.Count; i++)
             {
                 double val0 = Convert.ToDouble(values[i][0]);
@@ -138,23 +133,6 @@ namespace Laba4
             }
         }
 
-        void BuildChart(double x_min, double x_max, double dx)
-        {
-            Chart chart1 = new Chart();
-            //groupBox1.Controls.Add(chart1);
-            ChartArea area = new ChartArea();
-            area.AxisX.Minimum = x_min;
-            area.AxisX.Maximum = x_max;
-            area.AxisX.MajorGrid.Enabled = true;
-            chart1.ChartAreas.Add(area);
-            Series series1 = new Series();
-            series1.ChartType = SeriesChartType.Column;
-            chart1.Series.Add(series1);
-            for (int i = 0; i < array1.Count; i++)
-                chart1.Series[0].Points.Add(array1[i]);//отрисовка
-            chart1.Update();
-        }
-
         private void button3_Click(object sender, EventArgs e)
         {
             try
@@ -186,6 +164,17 @@ namespace Laba4
                 Thread Insert = new Thread(new ParameterizedThreadStart(InsertSort));
                 threads.Add(Insert);
                 Insert.Start(array2);
+            }
+            if(checkBox4.Checked == true)
+            {
+                double[] arr = new double[array4.Count()];
+                for (int i = 0; i < array4.Count(); i++)
+                {
+                    arr[i] = array4[i];
+                }
+                Thread Quick = new Thread(new ParameterizedThreadStart(QuickSort));
+                threads.Add(Quick);
+                Quick.Start(arr);
             }
             if(checkBox5.Checked == true)
             {
@@ -425,6 +414,70 @@ namespace Laba4
                     item.Resume();
             }
             
+        }
+        public int Wall(double[] array, int minIndex, int maxIndex)
+        {
+            var pivot = minIndex - 1;
+            for (var i = minIndex; i < maxIndex; ++i)
+            {
+                if (array[i] < array[maxIndex])
+                {
+                    ++pivot;
+                    Swap(array[pivot], array[i]);
+                }
+            }
+
+            ++pivot;
+            Swap(array[pivot], array[maxIndex]);
+            return pivot;
+        }
+
+        public double[] QuickSort(double[] array, int minIndex, int maxIndex)
+        {
+            if (minIndex >= maxIndex)
+            {
+                return array;
+            }
+
+            var pivotIndex = Wall(array, minIndex, maxIndex);
+            QuickSort(array, minIndex, pivotIndex - 1);
+            QuickSort(array, pivotIndex + 1, maxIndex);
+
+            return array;
+        }
+
+        public void QuickSort(object a)
+        {
+            double[] array = (double[])a;
+
+            Chart chart4 = new Chart();
+            ChartArea area = new ChartArea();
+            chart4.Size = new System.Drawing.Size(290, 210);
+            chart4.Location = new System.Drawing.Point(8, 229);
+            area.AxisX.Minimum = 0;
+            area.AxisX.Maximum = array.GetLength(0) + 1;
+            area.AxisX.MajorGrid.Enabled = true;
+            chart4.ChartAreas.Add(area);
+            Series series1 = new Series("Сортировка пузырьком");
+            series1.ChartType = SeriesChartType.Column;
+            series1.Legend = "Legend1";
+            chart4.Series.Add(series1);
+            for (int i = 0; i < array.GetLength(0); i++)
+                chart4.Series[0].Points.Add(array[i]);
+            Action action = () => addchart(chart4);
+            Invoke(action);
+            Action action2 = () => chart4.Update();
+            Invoke(action2);
+            Thread.Sleep(500);
+
+            QuickSort(array, 0, array.Length - 1);
+        }
+
+        public void Swap(double x, double y)
+        {
+            var temp = x;
+            x = y;
+            y = temp;
         }
     }
 }
