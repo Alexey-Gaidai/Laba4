@@ -20,13 +20,18 @@ namespace Laba4
 {
     public partial class Form1 : Form
     {
-        public static List<double> steps = new List<double>();//список точек
-        public static double[] array1;
-        public static double[] array2;
-        public static double[] array3;
-        public static double[] array4;
-        public static double[] array5;
+
+        public static List<double> array1 = new List<double>();
+        public static List<double> array2 = new List<double>();
+        public static List<double> array3 = new List<double>();
+        public static List<double> array4 = new List<double>();
+        public static List<double> array5 = new List<double>();
+
         public string[,] list;
+
+        List<Thread> threads = new List<Thread>();
+
+        public bool pause;
 
         private static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
         private const string SpreadsheetId = "1Kcvpqi-I6wY0HSFGehgdVp_tS70Fk2KQroZT39Z8S5Q";
@@ -51,26 +56,26 @@ namespace Laba4
 
         private async Task ReadAsync(SpreadsheetsResource.ValuesResource valuesResource)//выполняем чтение
         {
-            var response = await valuesResource.Get(textBox2.Text, ReadRange).ExecuteAsync();
+            var response = await valuesResource.Get(SpreadsheetId, ReadRange).ExecuteAsync();
             var values = response.Values;
             if (values == null || !values.Any())
             {
                 Console.WriteLine("No data found.");
                 return;
             }
-            array1 = new double[values.Count];
+            /*array1 = new double[values.Count];
             array2 = new double[values.Count];
             array3 = new double[values.Count];
             array4 = new double[values.Count];
-            array5 = new double[values.Count];
+            array5 = new double[values.Count];*/
             for (int i = 0; i < values.Count; i++)
             {
                 double val0 = Convert.ToDouble(values[i][0]);
-                array1[i] = val0;
-                array2[i] = val0;
-                array3[i] = val0;
-                array4[i] = val0;
-                array5[i] = val0;
+                array1.Add(val0);
+                array2.Add(val0);
+                array3.Add(val0);
+                array4.Add(val0);
+                array5.Add(val0);
             }
 
         }
@@ -121,7 +126,7 @@ namespace Laba4
             {
                 var serviceValues = GetSheetsService().Spreadsheets.Values;
                 await ReadAsync(serviceValues);
-                for (int i = 0; i < array1.GetLength(0); i++)
+                for (int i = 0; i < array1.Count; i++)
                 {
                     dataGridView1.Rows.Add(array1[i]);
                 }
@@ -145,7 +150,7 @@ namespace Laba4
             Series series1 = new Series();
             series1.ChartType = SeriesChartType.Column;
             chart1.Series.Add(series1);
-            for (int i = 0; i < array1.GetLength(0); i++)
+            for (int i = 0; i < array1.Count; i++)
                 chart1.Series[0].Points.Add(array1[i]);//отрисовка
             chart1.Update();
         }
@@ -155,13 +160,11 @@ namespace Laba4
             try
             {
                 ExportExcel();
-                array1 = new double[list.GetLength(0)];
                 for (int i = 0; i < list.GetLength(0); i++)
                 {
                     array1[i] = Convert.ToDouble(list[i,0]);
                     dataGridView1.Rows.Add(array1[i]);
                 }
-                BuildChart(0, array1.GetLength(0) + 1, 1);
             }
             catch (Exception ex)
             {
@@ -169,21 +172,25 @@ namespace Laba4
             }
         }
 
-        async private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
+            pause = true;
             if(checkBox1.Checked == true)
             {
                 Thread bubble = new Thread(new ParameterizedThreadStart(BubbleSort));
+                threads.Add(bubble);
                 bubble.Start(array1);
             }
             if(checkBox2.Checked == true)
             {
                 Thread Insert = new Thread(new ParameterizedThreadStart(InsertSort));
+                threads.Add(Insert);
                 Insert.Start(array2);
             }
             if(checkBox5.Checked == true)
             {
                 Thread Bogo = new Thread(new ParameterizedThreadStart(BogoSort));
+                threads.Add(Bogo);
                 Bogo.Start(array5);
             }
 
@@ -209,21 +216,20 @@ namespace Laba4
 
         public void BubbleSort(object arr1)
         {
-            double[] arr = (double[])arr1;
             Chart chart1 = new Chart();
             ChartArea area = new ChartArea();
             chart1.Size = new System.Drawing.Size(290, 210);
             chart1.Location = new System.Drawing.Point(6, 19);
             area.AxisX.Minimum = 0;
-            area.AxisX.Maximum = arr.Length+1;
+            area.AxisX.Maximum = array1.Count()+1;
             area.AxisX.MajorGrid.Enabled = true;
             chart1.ChartAreas.Add(area);
             Series series1 = new Series("Сортировка пузырьком");
             series1.ChartType = SeriesChartType.Column;
             series1.Legend = "Legend1";
             chart1.Series.Add(series1);
-            for (int i = 0; i < arr.GetLength(0); i++)
-                chart1.Series[0].Points.Add(arr[i]);
+            for (int i = 0; i < array1.Count(); i++)
+                chart1.Series[0].Points.Add(array1[i]);
             Action action2 = () => chart1.Update();
             Invoke(action2);
             Action action = () => addchart(chart1);
@@ -233,23 +239,25 @@ namespace Laba4
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            for (int i = 0; i<arr.Length; ++i)
+            for (int i = 0; i < array1.Count(); ++i)
             {
-                for (int j = i + 1; j<arr.Length; ++j)
+                for (int j = i + 1; j < array1.Count(); ++j)
                 {
-                    if (arr[i] > arr[j])
+                    if (array1[i] > array1[j])
                     {
-                        temp = arr[i];
-                        arr[i] = arr[j];
-                        arr[j] = temp;
+                        temp = array1[i];
+                        array1[i] = array1[j];
+                        array1[j] = temp;
                         Action action3 = () => chart1.Series[0].Points.Clear();
                         Invoke(action3);
-                        for (int k = 0; k < arr.GetLength(0); k++)
+                        for (int k = 0; k < array1.Count(); k++)
                         {
-                            Action action4 = () => chart1.Series[0].Points.Add(arr[k]);
+                            Action action4 = () => chart1.Series[0].Points.Add(array1[k]);
                             Invoke(action4);
                         }
                         Thread.Sleep(500);
+                        if (pause == false)
+                            Thread.Sleep(10000000);
                     }
                 }
             }
@@ -262,21 +270,20 @@ namespace Laba4
 
         public void InsertSort(object arr1)
         {
-            double[] arr = (double[])arr1;
             Chart chart2 = new Chart();
             ChartArea area = new ChartArea();
             chart2.Size = new System.Drawing.Size(290, 210);
             chart2.Location = new System.Drawing.Point(298, 19);
             area.AxisX.Minimum = 0;
-            area.AxisX.Maximum = arr.Length + 1;
+            area.AxisX.Maximum = array2.Count()+1;
             area.AxisX.MajorGrid.Enabled = true;
             chart2.ChartAreas.Add(area);
             Series series1 = new Series("Сортировка пузырьком");
             series1.ChartType = SeriesChartType.Column;
             series1.Legend = "Legend1";
             chart2.Series.Add(series1);
-            for (int i = 0; i < arr.GetLength(0); i++)
-                chart2.Series[0].Points.Add(arr[i]);
+            for (int i = 0; i < array2.Count(); i++)
+                chart2.Series[0].Points.Add(array2[i]);
             Action action = () => addchart(chart2);
             Invoke(action);
             Action action2 = () => chart2.Update();
@@ -286,25 +293,27 @@ namespace Laba4
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            for (int i = 1; i<arr.Length; ++i)
+            for (int i = 1; i< array2.Count(); ++i)
             {
-                double key = arr[i];
+                double key = array2[i];
                 int j = i - 1;
 
-                while (j >= 0 && arr[j] > key)
+                while (j >= 0 && array2[j] > key)
                 {
-                    arr[j + 1] = arr[j];
+                    array2[j + 1] = array2[j];
                     --j;
                 }
-                 arr[j + 1] = key;
+                 array2[j + 1] = key;
                 Action action3 = () => chart2.Series[0].Points.Clear();
                 Invoke(action3);
-                for (int k = 0; k < arr.GetLength(0); k++)
+                for (int k = 0; k < array2.Count(); k++)
                 {
-                    Action action4 = () => chart2.Series[0].Points.Add(arr[k]);
+                    Action action4 = () => chart2.Series[0].Points.Add(array2[k]);
                     Invoke(action4);
                 }
                 Thread.Sleep(500);
+                if (pause == false)
+                    Thread.Sleep(10000000);
             }
             sw.Stop();
             double aaa = sw.ElapsedMilliseconds / 1000;
@@ -316,21 +325,20 @@ namespace Laba4
 
         public void BogoSort(object arr1)
         {
-            double[] arr = (double[])arr1;
             Chart chart2 = new Chart();
             ChartArea area = new ChartArea();
             chart2.Size = new System.Drawing.Size(290, 210);
             chart2.Location = new System.Drawing.Point(8, 229);
             area.AxisX.Minimum = 0;
-            area.AxisX.Maximum = arr.Length + 1;
+            area.AxisX.Maximum = array3.Count()+1;
             area.AxisX.MajorGrid.Enabled = true;
             chart2.ChartAreas.Add(area);
             Series series1 = new Series("Сортировка пузырьком");
             series1.ChartType = SeriesChartType.Column;
             series1.Legend = "Legend1";
             chart2.Series.Add(series1);
-            for (int i = 0; i < arr.GetLength(0); i++)
-                chart2.Series[0].Points.Add(arr[i]);
+            for (int i = 0; i < array3.Count(); i++)
+                chart2.Series[0].Points.Add(array3[i]);
             Action action = () => addchart(chart2);
             Invoke(action);
             Action action2 = () => chart2.Update();
@@ -340,14 +348,14 @@ namespace Laba4
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            while (!IsSorted(arr))
+            while (!IsSorted())
             {
-                arr = RandomSwap(arr);
+                RandomSwap();
                 Action action3 = () => chart2.Series[0].Points.Clear();
                 Invoke(action3);
-                for (int k = 0; k < arr.GetLength(0); k++)
+                for (int k = 0; k < array3.Count(); k++)
                 {
-                    Action action4 = () => chart2.Series[0].Points.Add(arr[k]);
+                    Action action4 = () => chart2.Series[0].Points.Add(array3[k]);
                     Invoke(action4);
                 }
                 Thread.Sleep(500);
@@ -357,11 +365,11 @@ namespace Laba4
             Action action5 = () => label4.Text = aaa.ToString();
             Invoke(action5);
         }
-        public static bool IsSorted(double[] arr)
+        public static bool IsSorted()
         {
-            for (int i = 0; i < arr.Length - 1; i++)
+            for (int i = 0; i < array3.Count - 1; i++)
             {
-                if (arr[i] > arr[i + 1])
+                if (array3[i] > array3[i + 1])
                 {
                     return false;
                 }
@@ -370,21 +378,53 @@ namespace Laba4
             return true;
         }
 
-        public static double[] RandomSwap(double[] arr)
+        public static void RandomSwap()
         {   
             Random random = new Random();
-            var n = arr.Length;
+            var n = array3.Count();
             while (n > 1)
             {
                 --n;
                 var i = random.Next(n + 1);
-                var temp = arr[i];
-                arr[i] = arr[n];
-                arr[n] = temp;
+                var temp = array3[i];
+                array3[i] = array3[n];
+                array3[n] = temp;
             }
-
-            return arr;
         }
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+            foreach (var item in threads)
+            {
+                if (item.ThreadState != System.Threading.ThreadState.Stopped)
+                    item.Suspend();
+            }
+        }
+
+        private void очиститьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (var item in threads)
+            {
+                item.Abort();
+            }
+            groupBox1.Controls.Clear();
+            threads.Clear();
+            dataGridView1.Rows.Clear();
+            array1.Clear();
+            array2.Clear();
+            array3.Clear();
+            array4.Clear();
+            array5.Clear();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            foreach (var item in threads)
+            {
+                if (item.ThreadState != System.Threading.ThreadState.Stopped)
+                    item.Resume();
+            }
+            
+        }
     }
 }
