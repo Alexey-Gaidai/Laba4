@@ -185,18 +185,6 @@ namespace Laba4
 
         }
 
-        /*async Task<Double[]> bubble(double[] arr)//асинхроним расчеты метода
-        {
-            var result = await Task.Run(() => BubbleSort(arr));
-            return result;
-        }*/
-
-        /*async Task<Double[]> insert(double[] arr)//асинхроним расчеты метода
-        {
-            var result = await Task.Run(() => InsertSort(arr));
-            return result;
-        }*/
-
         public void addchart(Chart chart)
         {
             groupBox1.Controls.Add(chart);
@@ -417,29 +405,48 @@ namespace Laba4
         }
         public int Wall(double[] array, int minIndex, int maxIndex)
         {
+
             var pivot = minIndex - 1;
             for (var i = minIndex; i < maxIndex; ++i)
             {
+                Action action4 = () => chart1.Series[0].Points.Clear();
+                Invoke(action4);
                 if (array[i] < array[maxIndex])
                 {
                     ++pivot;
-                    Swap(array[pivot], array[i]);
+                    Swap(ref array[pivot], ref array[i]);
+                    for (int g = 0; g < array.GetLength(0); g++)
+                    {
+                        Action action3 = () => chart1.Series[0].Points.Add(array[g]);
+                        Invoke(action3);
+                    }
+                    Thread.Sleep(1000);
                 }
             }
 
             ++pivot;
-            Swap(array[pivot], array[maxIndex]);
+            Swap(ref array[pivot], ref array[maxIndex]);
+            Action action5 = () => chart1.Series[0].Points.Clear();
+            Invoke(action5);
+            for (int g = 0; g < array.GetLength(0); g++)
+            {
+                Action action3 = () => chart1.Series[0].Points.Add(array[g]);
+                Invoke(action3);
+            }
+            Thread.Sleep(1000);
             return pivot;
         }
 
         public double[] QuickSort(double[] array, int minIndex, int maxIndex)
         {
+
             if (minIndex >= maxIndex)
             {
                 return array;
             }
 
             var pivotIndex = Wall(array, minIndex, maxIndex);
+
             QuickSort(array, minIndex, pivotIndex - 1);
             QuickSort(array, pivotIndex + 1, maxIndex);
 
@@ -449,31 +456,16 @@ namespace Laba4
         public void QuickSort(object a)
         {
             double[] array = (double[])a;
-
-            Chart chart4 = new Chart();
-            ChartArea area = new ChartArea();
-            chart4.Size = new System.Drawing.Size(290, 210);
-            chart4.Location = new System.Drawing.Point(8, 229);
-            area.AxisX.Minimum = 0;
-            area.AxisX.Maximum = array.GetLength(0) + 1;
-            area.AxisX.MajorGrid.Enabled = true;
-            chart4.ChartAreas.Add(area);
-            Series series1 = new Series("Сортировка пузырьком");
-            series1.ChartType = SeriesChartType.Column;
-            series1.Legend = "Legend1";
-            chart4.Series.Add(series1);
             for (int i = 0; i < array.GetLength(0); i++)
-                chart4.Series[0].Points.Add(array[i]);
-            Action action = () => addchart(chart4);
-            Invoke(action);
-            Action action2 = () => chart4.Update();
-            Invoke(action2);
-            Thread.Sleep(500);
-
+            {
+                Action action3 = () => chart1.Series[0].Points.Add(array[i]);
+                Invoke(action3);
+            }
             QuickSort(array, 0, array.Length - 1);
+            Thread.Sleep(1000);
         }
 
-        public void Swap(double x, double y)
+        public void Swap(ref double x, ref double y)
         {
             var temp = x;
             x = y;
