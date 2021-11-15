@@ -20,18 +20,18 @@ namespace Laba4
 {
     public partial class Form1 : Form
     {
-
-        public static List<double> array1 = new List<double>();
-        public static List<double> array2 = new List<double>();
-        public static List<double> array3 = new List<double>();
-        public static List<double> array4 = new List<double>();
-        public static List<double> array5 = new List<double>();
+        public double[] bbb;
+        public double[] array1;
+        public double[] array2;
+        public double[] array3;
+        public double[] array4;
+        public double[] array5;
 
         public string[,] list;
 
         List<Thread> threads = new List<Thread>();
 
-        public bool pause;
+        public bool locker = false;
 
         private static readonly string[] Scopes = { SheetsService.Scope.Spreadsheets };
         private const string SpreadsheetId = "1Kcvpqi-I6wY0HSFGehgdVp_tS70Fk2KQroZT39Z8S5Q";
@@ -63,14 +63,20 @@ namespace Laba4
                 Console.WriteLine("No data found.");
                 return;
             }
+            array1 = new double[values.Count];
+            array2 = new double[values.Count];
+            array3 = new double[values.Count];
+            array4 = new double[values.Count];
+            array5 = new double[values.Count];
+
             for (int i = 0; i < values.Count; i++)
             {
                 double val0 = Convert.ToDouble(values[i][0]);
-                array1.Add(val0);
-                array2.Add(val0);
-                array3.Add(val0);
-                array4.Add(val0);
-                array5.Add(val0);
+                array1[i] = val0;
+                array2[i] = val0;
+                array3[i] = val0;
+                array4[i] = val0;
+                array5[i] = val0;
             }
 
         }
@@ -115,22 +121,65 @@ namespace Laba4
 
 
 
-        async private void button4_Click(object sender, EventArgs e)
+        
+
+        #region UserInteraction
+        private void button1_Click(object sender, EventArgs e)
         {
-            try
+            if (locker == false)
             {
-                var serviceValues = GetSheetsService().Spreadsheets.Values;
-                await ReadAsync(serviceValues);
-                for (int i = 0; i < array1.Count; i++)
+                if (array1 != null || array2 != null || array3 != null || array4 != null || array5 != null)
                 {
-                    dataGridView1.Rows.Add(array1[i]);
+                    if (checkBox1.Checked == false && checkBox2.Checked == false && checkBox3.Checked == false && checkBox4.Checked == false && checkBox5.Checked == false)
+                    {
+                        MessageBox.Show("Выберите метод сортировки!", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                    else
+                    {
+                        if (checkBox1.Checked == true)
+                        {
+                            chart1.Series[0].Points.DataBindY(array1);
+                            Thread bubble = new Thread(new ParameterizedThreadStart(BubbleSort));
+                            threads.Add(bubble);
+                            bubble.Start(array1);
+                        }
+                        if (checkBox2.Checked == true)
+                        {
+                            Thread Insert = new Thread(new ParameterizedThreadStart(InsertSort));
+                            threads.Add(Insert);
+                            Insert.Start(array2);
+                        }
+                        if (checkBox3.Checked == true)
+                        {
+                            Thread Shaker = new Thread(new ThreadStart(ShakerSort));
+                            threads.Add(Shaker);
+                            Shaker.Start();
+                        }
+                        if (checkBox4.Checked == true)
+                        {
+                            Thread Quick = new Thread(new ParameterizedThreadStart(QuickSort));
+                            threads.Add(Quick);
+                            Quick.Start(array4);
+                        }
+                        if (checkBox5.Checked == true)
+                        {
+                            Thread Bogo = new Thread(new ParameterizedThreadStart(BogoSort));
+                            threads.Add(Bogo);
+                            Bogo.Start(array5);
+                        }
+                        locker = true;
+                    }
                 }
-                //BuildChart(0, steps.Count+1, 1);
+                else
+                {
+                    MessageBox.Show("Массив не был загружен. Загрузите массив и повторите попытку!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Нажмите Очистить и повторите заново", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -140,7 +189,7 @@ namespace Laba4
                 ExportExcel();
                 for (int i = 0; i < list.GetLength(0); i++)
                 {
-                    array1[i] = Convert.ToDouble(list[i,0]);
+                    array1[i] = Convert.ToDouble(list[i, 0]);
                     dataGridView1.Rows.Add(array1[i]);
                 }
             }
@@ -150,222 +199,20 @@ namespace Laba4
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        async private void button4_Click(object sender, EventArgs e)
         {
-            pause = true;
-            if(checkBox1.Checked == true)
+            try
             {
-                Thread bubble = new Thread(new ParameterizedThreadStart(BubbleSort));
-                threads.Add(bubble);
-                bubble.Start(array1);
-            }
-            if(checkBox2.Checked == true)
-            {
-                Thread Insert = new Thread(new ParameterizedThreadStart(InsertSort));
-                threads.Add(Insert);
-                Insert.Start(array2);
-            }
-            if(checkBox4.Checked == true)
-            {
-                double[] arr = new double[array4.Count()];
-                for (int i = 0; i < array4.Count(); i++)
+                var serviceValues = GetSheetsService().Spreadsheets.Values;
+                await ReadAsync(serviceValues);
+                for (int i = 0; i < array1.GetLength(0); i++)
                 {
-                    arr[i] = array4[i];
-                }
-                Thread Quick = new Thread(new ParameterizedThreadStart(QuickSort));
-                threads.Add(Quick);
-                Quick.Start(arr);
-            }
-            if(checkBox5.Checked == true)
-            {
-                Thread Bogo = new Thread(new ParameterizedThreadStart(BogoSort));
-                threads.Add(Bogo);
-                Bogo.Start(array5);
-            }
-
-        }
-
-        public void addchart(Chart chart)
-        {
-            groupBox1.Controls.Add(chart);
-        }
-        
-
-        public void BubbleSort(object arr1)
-        {
-            Chart chart1 = new Chart();
-            ChartArea area = new ChartArea();
-            chart1.Size = new System.Drawing.Size(290, 210);
-            chart1.Location = new System.Drawing.Point(6, 19);
-            area.AxisX.Minimum = 0;
-            area.AxisX.Maximum = array1.Count()+1;
-            area.AxisX.MajorGrid.Enabled = true;
-            chart1.ChartAreas.Add(area);
-            Series series1 = new Series("Сортировка пузырьком");
-            series1.ChartType = SeriesChartType.Column;
-            series1.Legend = "Legend1";
-            chart1.Series.Add(series1);
-            for (int i = 0; i < array1.Count(); i++)
-                chart1.Series[0].Points.Add(array1[i]);
-            Action action2 = () => chart1.Update();
-            Invoke(action2);
-            Action action = () => addchart(chart1);
-            Invoke(action);
-            double temp;
-            Thread.Sleep(500);
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < array1.Count(); ++i)
-            {
-                for (int j = i + 1; j < array1.Count(); ++j)
-                {
-                    if (array1[i] > array1[j])
-                    {
-                        temp = array1[i];
-                        array1[i] = array1[j];
-                        array1[j] = temp;
-                        Action action3 = () => chart1.Series[0].Points.Clear();
-                        Invoke(action3);
-                        for (int k = 0; k < array1.Count(); k++)
-                        {
-                            Action action4 = () => chart1.Series[0].Points.Add(array1[k]);
-                            Invoke(action4);
-                        }
-                        Thread.Sleep(500);
-                        if (pause == false)
-                            Thread.Sleep(10000000);
-                    }
+                    dataGridView1.Rows.Add(array1[i]);
                 }
             }
-            sw.Stop();
-            double aaa = sw.ElapsedMilliseconds / 1000;
-            Action action5 = () => label2.Text = aaa.ToString();
-            Invoke(action5);
-            //return arr;
-        }
-
-        public void InsertSort(object arr1)
-        {
-            Chart chart2 = new Chart();
-            ChartArea area = new ChartArea();
-            chart2.Size = new System.Drawing.Size(290, 210);
-            chart2.Location = new System.Drawing.Point(298, 19);
-            area.AxisX.Minimum = 0;
-            area.AxisX.Maximum = array2.Count()+1;
-            area.AxisX.MajorGrid.Enabled = true;
-            chart2.ChartAreas.Add(area);
-            Series series1 = new Series("Сортировка пузырьком");
-            series1.ChartType = SeriesChartType.Column;
-            series1.Legend = "Legend1";
-            chart2.Series.Add(series1);
-            for (int i = 0; i < array2.Count(); i++)
-                chart2.Series[0].Points.Add(array2[i]);
-            Action action = () => addchart(chart2);
-            Invoke(action);
-            Action action2 = () => chart2.Update();
-            Invoke(action2);
-            Thread.Sleep(500);
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            for (int i = 1; i< array2.Count(); ++i)
+            catch (Exception ex)
             {
-                double key = array2[i];
-                int j = i - 1;
-
-                while (j >= 0 && array2[j] > key)
-                {
-                    array2[j + 1] = array2[j];
-                    --j;
-                }
-                 array2[j + 1] = key;
-                Action action3 = () => chart2.Series[0].Points.Clear();
-                Invoke(action3);
-                for (int k = 0; k < array2.Count(); k++)
-                {
-                    Action action4 = () => chart2.Series[0].Points.Add(array2[k]);
-                    Invoke(action4);
-                }
-                Thread.Sleep(500);
-                if (pause == false)
-                    Thread.Sleep(10000000);
-            }
-            sw.Stop();
-            double aaa = sw.ElapsedMilliseconds / 1000;
-            Action action5 = () => label3.Text = aaa.ToString();
-            Invoke(action5);
-            //return arr;
-        }
-
-
-        public void BogoSort(object arr1)
-        {
-            Chart chart2 = new Chart();
-            ChartArea area = new ChartArea();
-            chart2.Size = new System.Drawing.Size(290, 210);
-            chart2.Location = new System.Drawing.Point(8, 229);
-            area.AxisX.Minimum = 0;
-            area.AxisX.Maximum = array3.Count()+1;
-            area.AxisX.MajorGrid.Enabled = true;
-            chart2.ChartAreas.Add(area);
-            Series series1 = new Series("Сортировка пузырьком");
-            series1.ChartType = SeriesChartType.Column;
-            series1.Legend = "Legend1";
-            chart2.Series.Add(series1);
-            for (int i = 0; i < array3.Count(); i++)
-                chart2.Series[0].Points.Add(array3[i]);
-            Action action = () => addchart(chart2);
-            Invoke(action);
-            Action action2 = () => chart2.Update();
-            Invoke(action2);
-            Thread.Sleep(500);
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            while (!IsSorted())
-            {
-                RandomSwap();
-                Action action3 = () => chart2.Series[0].Points.Clear();
-                Invoke(action3);
-                for (int k = 0; k < array3.Count(); k++)
-                {
-                    Action action4 = () => chart2.Series[0].Points.Add(array3[k]);
-                    Invoke(action4);
-                }
-                Thread.Sleep(500);
-            }
-            sw.Stop();
-            double aaa = sw.ElapsedMilliseconds / 1000;
-            Action action5 = () => label4.Text = aaa.ToString();
-            Invoke(action5);
-        }
-        public static bool IsSorted()
-        {
-            for (int i = 0; i < array3.Count - 1; i++)
-            {
-                if (array3[i] > array3[i + 1])
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public static void RandomSwap()
-        {   
-            Random random = new Random();
-            var n = array3.Count();
-            while (n > 1)
-            {
-                --n;
-                var i = random.Next(n + 1);
-                var temp = array3[i];
-                array3[i] = array3[n];
-                array3[n] = temp;
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -378,22 +225,6 @@ namespace Laba4
             }
         }
 
-        private void очиститьToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            foreach (var item in threads)
-            {
-                item.Abort();
-            }
-            groupBox1.Controls.Clear();
-            threads.Clear();
-            dataGridView1.Rows.Clear();
-            array1.Clear();
-            array2.Clear();
-            array3.Clear();
-            array4.Clear();
-            array5.Clear();
-        }
-
         private void button6_Click(object sender, EventArgs e)
         {
             foreach (var item in threads)
@@ -401,39 +232,215 @@ namespace Laba4
                 if (item.ThreadState != System.Threading.ThreadState.Stopped)
                     item.Resume();
             }
-            
+
         }
-        public int Wall(double[] array, int minIndex, int maxIndex)
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            if (locker == false)
+            {
+                if (array1 != null || array2 != null || array3 != null || array4 != null || array5 != null)
+                {
+                    if (checkBox1.Checked == false && checkBox2.Checked == false && checkBox3.Checked == false && checkBox4.Checked == false && checkBox5.Checked == false)
+                    {
+                        MessageBox.Show("Выберите метод сортировки!", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                    else
+                    {
+                        if (checkBox1.Checked == true)
+                        {
+                            chart1.Series[0].Points.DataBindY(array1);
+                            Thread Inversebubble = new Thread(new ParameterizedThreadStart(InverseBubbleSort));
+                            threads.Add(Inversebubble);
+                            Inversebubble.Start(array1);
+                        }
+                        if (checkBox2.Checked == true)
+                        {
+                            Thread InverseInsert = new Thread(new ParameterizedThreadStart(InverseInsertSort));
+                            threads.Add(InverseInsert);
+                            InverseInsert.Start(array2);
+                        }
+                        if (checkBox3.Checked == true)
+                        {
+                            Thread InverseShaker = new Thread(new ThreadStart(InverseShakerSort));
+                            threads.Add(InverseShaker);
+                            InverseShaker.Start();
+                        }
+                        if (checkBox4.Checked == true)
+                        {
+                            Thread Quick = new Thread(new ParameterizedThreadStart(QuickSort));
+                            threads.Add(Quick);
+                            Quick.Start(array4);
+                        }
+                        if (checkBox5.Checked == true)
+                        {
+                            Thread InverseBogo = new Thread(new ParameterizedThreadStart(InverseBogoSort));
+                            threads.Add(InverseBogo);
+                            InverseBogo.Start(array5);
+                        }
+                        locker = true;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Массив не был загружен. Загрузите массив и повторите попытку!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Нажмите Очистить и повторите заново", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+        private void очиститьToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (var item in threads)
+            {
+                if (item.ThreadState == System.Threading.ThreadState.Suspended)
+                {
+                    item.Resume();
+                    item.Abort();
+                }
+                else
+                    item.Abort();
+            }
+            threads.Clear();
+            dataGridView1.Rows.Clear();
+            array1 = null;
+            array2 = null;
+            array3 = null;
+            array4 = null;
+            array5 = null;
+            locker = false;
+            chart1.Series[0].Points.Clear();
+            chart2.Series[0].Points.Clear();
+            chart3.Series[0].Points.Clear();
+            chart4.Series[0].Points.Clear();
+            chart5.Series[0].Points.Clear();
+            checkBox1.Checked = false;
+            checkBox2.Checked = false;
+            checkBox3.Checked = false;
+            checkBox4.Checked = false;
+            checkBox5.Checked = false;
+            label1.Text = "";
+            label2.Text = "";
+            label3.Text = "";
+            label4.Text = "";
+            label5.Text = "";
+        }
+
+        #endregion
+
+        #region Sorts
+
+        public void BubbleSort(object arr1)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            double temp;
+            for (int i = 0; i < array1.GetLength(0); ++i)
+            {
+                for (int j = i + 1; j < array1.GetLength(0); ++j)
+                {
+                    if (array1[i] > array1[j])
+                    {
+                        temp = array1[i];
+                        array1[i] = array1[j];
+                        array1[j] = temp;
+                        Action action = () => chart1.Series[0].Points.DataBindY(array1);
+                        Invoke(action);
+                        Thread.Sleep(100);
+                    }
+                }
+            }
+            sw.Stop();
+            Action action5 = () => label2.Text = sw.ElapsedMilliseconds.ToString()+"ms";
+            Invoke(action5);
+        }
+
+        public void InsertSort(object arr1)
         {
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            for (int i = 1; i< array2.GetLength(0); ++i)
+            {
+                double key = array2[i];
+                int j = i - 1;
+
+                while (j >= 0 && array2[j] > key)
+                {
+                    array2[j + 1] = array2[j];
+                    --j;
+                }
+                 array2[j + 1] = key;
+                Action action = () => chart2.Series[0].Points.DataBindY(array2);
+                Invoke(action);
+                Thread.Sleep(100);
+            }
+            sw.Stop();
+            Action action5 = () => label3.Text = sw.ElapsedMilliseconds.ToString()+"ms";
+            Invoke(action5);
+        }
+
+
+        public void BogoSort(object arr1)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            while (!IsSorted())
+            {
+                RandomSwap();
+                Action action = () => chart5.Series[0].Points.DataBindY(array5);
+                Invoke(action);
+                Thread.Sleep(100);
+            }
+            sw.Stop();
+            Action action5 = () => label4.Text = sw.ElapsedMilliseconds.ToString()+"ms";
+            Invoke(action5);
+        }
+        public bool IsSorted()
+        {
+            for (int i = 0; i < array5.GetLength(0) - 1; i++)
+            {
+                if (array5[i] > array5[i + 1])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void RandomSwap()
+        {   
+            Random random = new Random();
+            var n = array5.GetLength(0);
+            while (n > 1)
+            {
+                --n;
+                var i = random.Next(n + 1);
+                var temp = array5[i];
+                array5[i] = array5[n];
+                array5[n] = temp;
+            }
+        }
+
+        public int Wall(double[] array, int minIndex, int maxIndex)
+        {
             var pivot = minIndex - 1;
             for (var i = minIndex; i < maxIndex; ++i)
             {
-                Action action4 = () => chart1.Series[0].Points.Clear();
-                Invoke(action4);
                 if (array[i] < array[maxIndex])
                 {
                     ++pivot;
                     Swap(ref array[pivot], ref array[i]);
-                    for (int g = 0; g < array.GetLength(0); g++)
-                    {
-                        Action action3 = () => chart1.Series[0].Points.Add(array[g]);
-                        Invoke(action3);
-                    }
-                    Thread.Sleep(1000);
                 }
             }
-
             ++pivot;
             Swap(ref array[pivot], ref array[maxIndex]);
-            Action action5 = () => chart1.Series[0].Points.Clear();
-            Invoke(action5);
-            for (int g = 0; g < array.GetLength(0); g++)
-            {
-                Action action3 = () => chart1.Series[0].Points.Add(array[g]);
-                Invoke(action3);
-            }
-            Thread.Sleep(1000);
+            Thread.Sleep(100);
             return pivot;
         }
 
@@ -446,23 +453,60 @@ namespace Laba4
             }
 
             var pivotIndex = Wall(array, minIndex, maxIndex);
-
+            Action action = () => chart4.Series[0].Points.DataBindY(array4);
+            Invoke(action);
             QuickSort(array, minIndex, pivotIndex - 1);
+            Invoke(action);
             QuickSort(array, pivotIndex + 1, maxIndex);
-
+            Invoke(action);
             return array;
         }
 
         public void QuickSort(object a)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             double[] array = (double[])a;
-            for (int i = 0; i < array.GetLength(0); i++)
-            {
-                Action action3 = () => chart1.Series[0].Points.Add(array[i]);
-                Invoke(action3);
-            }
             QuickSort(array, 0, array.Length - 1);
-            Thread.Sleep(1000);
+            sw.Stop();
+            Action action5 = () => label5.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+            Invoke(action5);
+        }
+
+        public void ShakerSort()
+        {
+            for (var i = 0; i < array3.GetLength(0) / 2; i++)
+            {
+                Action action = () => chart3.Series[0].Points.DataBindY(array3);
+                Invoke(action);
+                var swapFlag = false;
+                //проход слева направо
+                for (var j = i; j < array3.GetLength(0) - i - 1; j++)
+                {
+                    if (array3[j] > array3[j + 1])
+                    {
+                        Swap(ref array3[j], ref array3[j + 1]);
+                        swapFlag = true;
+                    }
+                }
+                Invoke(action);
+                //проход справа налево
+                for (var j = array3.Length - 2 - i; j > i; j--)
+                {
+                    if (array3[j - 1] > array3[j])
+                    {
+                        Swap(ref array3[j - 1], ref array3[j]);
+                        swapFlag = true;
+                    }
+                }
+                Invoke(action);
+                //если обменов не было выходим
+                if (!swapFlag)
+                {
+                    break;
+                }
+                Thread.Sleep(100);
+            }
         }
 
         public void Swap(ref double x, ref double y)
@@ -471,5 +515,125 @@ namespace Laba4
             x = y;
             y = temp;
         }
+
+        #endregion
+
+        #region InverseSorts
+        public void InverseBubbleSort(object arr1)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            double temp;
+            for (int i = 0; i < array1.GetLength(0); ++i)
+            {
+                for (int j = i + 1; j < array1.GetLength(0); ++j)
+                {
+                    if (array1[i] < array1[j])
+                    {
+                        temp = array1[i];
+                        array1[i] = array1[j];
+                        array1[j] = temp;
+                        Action action = () => chart1.Series[0].Points.DataBindY(array1);
+                        Invoke(action);
+                        Thread.Sleep(100);
+                    }
+                }
+            }
+            sw.Stop();
+            Action action5 = () => label2.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+            Invoke(action5);
+        }
+
+        public void InverseInsertSort(object arr1)
+        {
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            for (int i = 1; i < array2.GetLength(0); ++i)
+            {
+                double key = array2[i];
+                int j = i - 1;
+
+                while (j >= 0 && array2[j] < key)
+                {
+                    array2[j + 1] = array2[j];
+                    --j;
+                }
+                array2[j + 1] = key;
+                Action action = () => chart2.Series[0].Points.DataBindY(array2);
+                Invoke(action);
+                Thread.Sleep(100);
+            }
+            sw.Stop();
+            Action action5 = () => label3.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+            Invoke(action5);
+        }
+
+        public void InverseBogoSort(object arr1)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            while (!InverseIsSorted())
+            {
+                RandomSwap();
+                Action action = () => chart5.Series[0].Points.DataBindY(array5);
+                Invoke(action);
+                Thread.Sleep(100);
+            }
+            sw.Stop();
+            Action action5 = () => label4.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+            Invoke(action5);
+        }
+        public bool InverseIsSorted()
+        {
+            for (int i = 0; i < array5.GetLength(0) - 1; i++)
+            {
+                if (array5[i] < array5[i + 1])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void InverseShakerSort()
+        {
+            for (var i = 0; i < array3.GetLength(0) / 2; i++)
+            {
+                Action action = () => chart3.Series[0].Points.DataBindY(array3);
+                Invoke(action);
+                var swapFlag = false;
+                //проход слева направо
+                for (var j = i; j < array3.GetLength(0) - i - 1; j++)
+                {
+                    if (array3[j] < array3[j + 1])
+                    {
+                        Swap(ref array3[j], ref array3[j + 1]);
+                        swapFlag = true;
+                    }
+                }
+                Invoke(action);
+                //проход справа налево
+                for (var j = array3.Length - 2 - i; j > i; j--)
+                {
+                    if (array3[j - 1] < array3[j])
+                    {
+                        Swap(ref array3[j - 1], ref array3[j]);
+                        swapFlag = true;
+                    }
+                }
+                Invoke(action);
+                //если обменов не было выходим
+                if (!swapFlag)
+                {
+                    break;
+                }
+                Thread.Sleep(100);
+            }
+        }
+        #endregion
     }
 }
