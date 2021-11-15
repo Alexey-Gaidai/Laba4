@@ -268,9 +268,9 @@ namespace Laba4
                         }
                         if (checkBox4.Checked == true)
                         {
-                            Thread Quick = new Thread(new ParameterizedThreadStart(QuickSort));
-                            threads.Add(Quick);
-                            Quick.Start(array4);
+                            Thread InverseQuick = new Thread(new ParameterizedThreadStart(InverseQuickSort));
+                            threads.Add(InverseQuick);
+                            InverseQuick.Start(array4);
                         }
                         if (checkBox5.Checked == true)
                         {
@@ -633,6 +633,52 @@ namespace Laba4
                 }
                 Thread.Sleep(100);
             }
+        }
+
+        public int InverseWall(double[] array, int minIndex, int maxIndex)
+        {
+            var pivot = minIndex - 1;
+            for (var i = minIndex; i < maxIndex; ++i)
+            {
+                if (array[i] > array[maxIndex])
+                {
+                    ++pivot;
+                    Swap(ref array[pivot], ref array[i]);
+                }
+            }
+            ++pivot;
+            Swap(ref array[pivot], ref array[maxIndex]);
+            Thread.Sleep(100);
+            return pivot;
+        }
+
+        public double[] InverseQuickSort(double[] array, int minIndex, int maxIndex)
+        {
+
+            if (minIndex >= maxIndex)
+            {
+                return array;
+            }
+
+            var pivotIndex = InverseWall(array, minIndex, maxIndex);
+            Action action = () => chart4.Series[0].Points.DataBindY(array4);
+            Invoke(action);
+            InverseQuickSort(array, minIndex, pivotIndex - 1);
+            Invoke(action);
+            InverseQuickSort(array, pivotIndex + 1, maxIndex);
+            Invoke(action);
+            return array;
+        }
+
+        public void InverseQuickSort(object a)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            double[] array = (double[])a;
+            InverseQuickSort(array, 0, array.Length - 1);
+            sw.Stop();
+            Action action5 = () => label5.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+            Invoke(action5);
         }
         #endregion
     }
