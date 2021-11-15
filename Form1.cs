@@ -117,13 +117,29 @@ namespace Laba4
             GC.Collect();
         }
 
+        public void randompoints(int n)//рандомное заполнение точек
+        {
+            Random rnd = new Random();
+            array1 = new double[n];
+            array2 = new double[n];
+            array3 = new double[n];
+            array4 = new double[n];
+            array5 = new double[n];
+            for (int i = 0; i < n; i++)
+            {
+                double a = Math.Round(rnd.NextDouble() * 100, 3);
+                array1[i] = a;
+                array2[i] = a;
+                array3[i] = a;
+                array4[i] = a;
+                array5[i] = a;
+                dataGridView1.Rows.Add(a);
+            }
+        }
 
 
 
-
-        
-
-        #region UserInteraction
+            #region UserInteraction
         private void button1_Click(object sender, EventArgs e)
         {
             if (locker == false)
@@ -174,6 +190,10 @@ namespace Laba4
                 {
                     MessageBox.Show("Массив не был загружен. Загрузите массив и повторите попытку!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+                if (array1.GetLength(0) < 3 && array2.GetLength(0) < 3 && array3.GetLength(0) < 3 && array4.GetLength(0) < 3 && array5.GetLength(0) < 3)
+                {
+                    MessageBox.Show("Маленькое количество элементов, программа может работать некорректно", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             else
             {
@@ -187,9 +207,18 @@ namespace Laba4
             try
             {
                 ExportExcel();
+                array1 = new double[list.GetLength(0)];
+                array2 = new double[list.GetLength(0)];
+                array3 = new double[list.GetLength(0)];
+                array4 = new double[list.GetLength(0)];
+                array5 = new double[list.GetLength(0)];
                 for (int i = 0; i < list.GetLength(0); i++)
                 {
                     array1[i] = Convert.ToDouble(list[i, 0]);
+                    array2[i] = Convert.ToDouble(list[i, 0]);
+                    array3[i] = Convert.ToDouble(list[i, 0]);
+                    array4[i] = Convert.ToDouble(list[i, 0]);
+                    array5[i] = Convert.ToDouble(list[i, 0]);
                     dataGridView1.Rows.Add(array1[i]);
                 }
             }
@@ -232,7 +261,6 @@ namespace Laba4
                 if (item.ThreadState != System.Threading.ThreadState.Stopped)
                     item.Resume();
             }
-
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -285,6 +313,10 @@ namespace Laba4
                 {
                     MessageBox.Show("Массив не был загружен. Загрузите массив и повторите попытку!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+                if (array1.GetLength(0) < 3 && array2.GetLength(0) < 3 && array3.GetLength(0) < 3 && array4.GetLength(0) < 3 && array5.GetLength(0) < 3)
+                {
+                    MessageBox.Show("Маленькое количество элементов, программа может работать некорректно", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             else
             {
@@ -310,6 +342,7 @@ namespace Laba4
             array3 = null;
             array4 = null;
             array5 = null;
+            list = null;
             locker = false;
             chart1.Series[0].Points.Clear();
             chart2.Series[0].Points.Clear();
@@ -326,13 +359,14 @@ namespace Laba4
             label3.Text = "";
             label4.Text = "";
             label5.Text = "";
+            label7.Text = ""; 
         }
 
         #endregion
 
         #region Sorts
 
-        public void BubbleSort(object arr1)
+        public async void BubbleSort(object arr1)
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -346,9 +380,10 @@ namespace Laba4
                         temp = array1[i];
                         array1[i] = array1[j];
                         array1[j] = temp;
+                        //await aaaaaaa(array1, chart1);
                         Action action = () => chart1.Series[0].Points.DataBindY(array1);
                         Invoke(action);
-                        Thread.Sleep(100);
+                        Thread.Sleep(Convert.ToInt32(textBox3.Text));
                     }
                 }
             }
@@ -359,46 +394,58 @@ namespace Laba4
 
         public void InsertSort(object arr1)
         {
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            for (int i = 1; i< array2.GetLength(0); ++i)
+            try
             {
-                double key = array2[i];
-                int j = i - 1;
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
 
-                while (j >= 0 && array2[j] > key)
+                for (int i = 1; i < array2.GetLength(0); ++i)
                 {
-                    array2[j + 1] = array2[j];
-                    --j;
-                }
-                 array2[j + 1] = key;
-                Action action = () => chart2.Series[0].Points.DataBindY(array2);
-                Invoke(action);
-                Thread.Sleep(100);
-            }
-            sw.Stop();
-            Action action5 = () => label3.Text = sw.ElapsedMilliseconds.ToString()+"ms";
-            Invoke(action5);
-        }
+                    double key = array2[i];
+                    int j = i - 1;
 
+                    while (j >= 0 && array2[j] > key)
+                    {
+                        array2[j + 1] = array2[j];
+                        --j;
+                    }
+                    array2[j + 1] = key;
+                    Action action = () => chart2.Series[0].Points.DataBindY(array2);
+                    Invoke(action);
+                    Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                }
+                sw.Stop();
+                Action action5 = () => label3.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                Invoke(action5);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         public void BogoSort(object arr1)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            while (!IsSorted())
+            try
             {
-                RandomSwap();
-                Action action = () => chart5.Series[0].Points.DataBindY(array5);
-                Invoke(action);
-                Thread.Sleep(100);
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                while (!IsSorted())
+                {
+                    RandomSwap();
+                    Action action = () => chart5.Series[0].Points.DataBindY(array5);
+                    Invoke(action);
+                    Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                }
+                sw.Stop();
+                Action action5 = () => label4.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                Invoke(action5);
             }
-            sw.Stop();
-            Action action5 = () => label4.Text = sw.ElapsedMilliseconds.ToString()+"ms";
-            Invoke(action5);
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         public bool IsSorted()
         {
@@ -440,7 +487,7 @@ namespace Laba4
             }
             ++pivot;
             Swap(ref array[pivot], ref array[maxIndex]);
-            Thread.Sleep(100);
+            Thread.Sleep(Convert.ToInt32(textBox3.Text));
             return pivot;
         }
 
@@ -475,6 +522,8 @@ namespace Laba4
 
         public void ShakerSort()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             for (var i = 0; i < array3.GetLength(0) / 2; i++)
             {
                 Action action = () => chart3.Series[0].Points.DataBindY(array3);
@@ -505,8 +554,11 @@ namespace Laba4
                 {
                     break;
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(Convert.ToInt32(textBox3.Text));
             }
+            sw.Stop();
+            Action action1 = () => label7.Text = sw.ElapsedMilliseconds.ToString()+"ms";
+            Invoke(action1);
         }
 
         public void Swap(ref double x, ref double y)
@@ -535,7 +587,7 @@ namespace Laba4
                         array1[j] = temp;
                         Action action = () => chart1.Series[0].Points.DataBindY(array1);
                         Invoke(action);
-                        Thread.Sleep(100);
+                        Thread.Sleep(Convert.ToInt32(textBox3.Text));
                     }
                 }
             }
@@ -563,7 +615,7 @@ namespace Laba4
                 array2[j + 1] = key;
                 Action action = () => chart2.Series[0].Points.DataBindY(array2);
                 Invoke(action);
-                Thread.Sleep(100);
+                Thread.Sleep(Convert.ToInt32(textBox3.Text));
             }
             sw.Stop();
             Action action5 = () => label3.Text = sw.ElapsedMilliseconds.ToString() + "ms";
@@ -580,7 +632,7 @@ namespace Laba4
                 RandomSwap();
                 Action action = () => chart5.Series[0].Points.DataBindY(array5);
                 Invoke(action);
-                Thread.Sleep(100);
+                Thread.Sleep(Convert.ToInt32(textBox3.Text));
             }
             sw.Stop();
             Action action5 = () => label4.Text = sw.ElapsedMilliseconds.ToString() + "ms";
@@ -601,6 +653,8 @@ namespace Laba4
 
         public void InverseShakerSort()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             for (var i = 0; i < array3.GetLength(0) / 2; i++)
             {
                 Action action = () => chart3.Series[0].Points.DataBindY(array3);
@@ -631,8 +685,11 @@ namespace Laba4
                 {
                     break;
                 }
-                Thread.Sleep(100);
+                Thread.Sleep(Convert.ToInt32(textBox3.Text));
             }
+            sw.Stop();
+            Action action1 = () => label7.Text = sw.ElapsedMilliseconds.ToString()+"ms";
+            Invoke(action1);
         }
 
         public int InverseWall(double[] array, int minIndex, int maxIndex)
@@ -648,7 +705,7 @@ namespace Laba4
             }
             ++pivot;
             Swap(ref array[pivot], ref array[maxIndex]);
-            Thread.Sleep(100);
+            Thread.Sleep(Convert.ToInt32(textBox3.Text));
             return pivot;
         }
 
@@ -681,5 +738,32 @@ namespace Laba4
             Invoke(action5);
         }
         #endregion
+
+        async private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (textBox1.Text == "")
+                {
+                    MessageBox.Show("Введите количество элементов!", "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                    randompoints(Convert.ToInt32(textBox1.Text));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void выходToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            textBox3.Text = "0";
+        }
     }
 }
