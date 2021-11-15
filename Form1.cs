@@ -56,7 +56,7 @@ namespace Laba4
 
         private async Task ReadAsync(SpreadsheetsResource.ValuesResource valuesResource)//выполняем чтение
         {
-            var response = await valuesResource.Get(SpreadsheetId, ReadRange).ExecuteAsync();
+            var response = await valuesResource.Get(textBox2.Text, ReadRange).ExecuteAsync();
             var values = response.Values;
             if (values == null || !values.Any())
             {
@@ -368,28 +368,35 @@ namespace Laba4
 
         public async void BubbleSort(object arr1)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            double temp;
-            for (int i = 0; i < array1.GetLength(0); ++i)
+            try
             {
-                for (int j = i + 1; j < array1.GetLength(0); ++j)
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                double temp;
+                for (int i = 0; i < array1.GetLength(0); ++i)
                 {
-                    if (array1[i] > array1[j])
+                    for (int j = i + 1; j < array1.GetLength(0); ++j)
                     {
-                        temp = array1[i];
-                        array1[i] = array1[j];
-                        array1[j] = temp;
-                        //await aaaaaaa(array1, chart1);
-                        Action action = () => chart1.Series[0].Points.DataBindY(array1);
-                        Invoke(action);
-                        Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                        if (array1[i] > array1[j])
+                        {
+                            temp = array1[i];
+                            array1[i] = array1[j];
+                            array1[j] = temp;
+                            //await aaaaaaa(array1, chart1);
+                            Action action = () => chart1.Series[0].Points.DataBindY(array1);
+                            Invoke(action);
+                            Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                        }
                     }
                 }
+                sw.Stop();
+                Action action5 = () => label2.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                Invoke(action5);
             }
-            sw.Stop();
-            Action action5 = () => label2.Text = sw.ElapsedMilliseconds.ToString()+"ms";
-            Invoke(action5);
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public void InsertSort(object arr1)
@@ -493,19 +500,26 @@ namespace Laba4
 
         public double[] QuickSort(double[] array, int minIndex, int maxIndex)
         {
-
-            if (minIndex >= maxIndex)
+            try
             {
-                return array;
-            }
+                if (minIndex >= maxIndex)
+                {
+                    return array;
+                }
 
-            var pivotIndex = Wall(array, minIndex, maxIndex);
-            Action action = () => chart4.Series[0].Points.DataBindY(array4);
-            Invoke(action);
-            QuickSort(array, minIndex, pivotIndex - 1);
-            Invoke(action);
-            QuickSort(array, pivotIndex + 1, maxIndex);
-            Invoke(action);
+                var pivotIndex = Wall(array, minIndex, maxIndex);
+                Action action = () => chart4.Series[0].Points.DataBindY(array4);
+                Invoke(action);
+                QuickSort(array, minIndex, pivotIndex - 1);
+                Invoke(action);
+                QuickSort(array, pivotIndex + 1, maxIndex);
+                Invoke(action);
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             return array;
         }
 
@@ -522,43 +536,50 @@ namespace Laba4
 
         public void ShakerSort()
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            for (var i = 0; i < array3.GetLength(0) / 2; i++)
+            try
             {
-                Action action = () => chart3.Series[0].Points.DataBindY(array3);
-                Invoke(action);
-                var swapFlag = false;
-                //проход слева направо
-                for (var j = i; j < array3.GetLength(0) - i - 1; j++)
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                for (var i = 0; i < array3.GetLength(0) / 2; i++)
                 {
-                    if (array3[j] > array3[j + 1])
+                    Action action = () => chart3.Series[0].Points.DataBindY(array3);
+                    Invoke(action);
+                    var swapFlag = false;
+                    //проход слева направо
+                    for (var j = i; j < array3.GetLength(0) - i - 1; j++)
                     {
-                        Swap(ref array3[j], ref array3[j + 1]);
-                        swapFlag = true;
+                        if (array3[j] > array3[j + 1])
+                        {
+                            Swap(ref array3[j], ref array3[j + 1]);
+                            swapFlag = true;
+                        }
                     }
-                }
-                Invoke(action);
-                //проход справа налево
-                for (var j = array3.Length - 2 - i; j > i; j--)
-                {
-                    if (array3[j - 1] > array3[j])
+                    Invoke(action);
+                    //проход справа налево
+                    for (var j = array3.Length - 2 - i; j > i; j--)
                     {
-                        Swap(ref array3[j - 1], ref array3[j]);
-                        swapFlag = true;
+                        if (array3[j - 1] > array3[j])
+                        {
+                            Swap(ref array3[j - 1], ref array3[j]);
+                            swapFlag = true;
+                        }
                     }
+                    Invoke(action);
+                    //если обменов не было выходим
+                    if (!swapFlag)
+                    {
+                        break;
+                    }
+                    Thread.Sleep(Convert.ToInt32(textBox3.Text));
                 }
-                Invoke(action);
-                //если обменов не было выходим
-                if (!swapFlag)
-                {
-                    break;
-                }
-                Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                sw.Stop();
+                Action action1 = () => label7.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                Invoke(action1);
             }
-            sw.Stop();
-            Action action1 = () => label7.Text = sw.ElapsedMilliseconds.ToString()+"ms";
-            Invoke(action1);
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public void Swap(ref double x, ref double y)
@@ -573,70 +594,90 @@ namespace Laba4
         #region InverseSorts
         public void InverseBubbleSort(object arr1)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            double temp;
-            for (int i = 0; i < array1.GetLength(0); ++i)
+            try
             {
-                for (int j = i + 1; j < array1.GetLength(0); ++j)
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                double temp;
+                for (int i = 0; i < array1.GetLength(0); ++i)
                 {
-                    if (array1[i] < array1[j])
+                    for (int j = i + 1; j < array1.GetLength(0); ++j)
                     {
-                        temp = array1[i];
-                        array1[i] = array1[j];
-                        array1[j] = temp;
-                        Action action = () => chart1.Series[0].Points.DataBindY(array1);
-                        Invoke(action);
-                        Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                        if (array1[i] < array1[j])
+                        {
+                            temp = array1[i];
+                            array1[i] = array1[j];
+                            array1[j] = temp;
+                            Action action = () => chart1.Series[0].Points.DataBindY(array1);
+                            Invoke(action);
+                            Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                        }
                     }
                 }
+                sw.Stop();
+                Action action5 = () => label2.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                Invoke(action5);
             }
-            sw.Stop();
-            Action action5 = () => label2.Text = sw.ElapsedMilliseconds.ToString() + "ms";
-            Invoke(action5);
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public void InverseInsertSort(object arr1)
         {
-
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            for (int i = 1; i < array2.GetLength(0); ++i)
+            try
             {
-                double key = array2[i];
-                int j = i - 1;
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
 
-                while (j >= 0 && array2[j] < key)
+                for (int i = 1; i < array2.GetLength(0); ++i)
                 {
-                    array2[j + 1] = array2[j];
-                    --j;
+                    double key = array2[i];
+                    int j = i - 1;
+
+                    while (j >= 0 && array2[j] < key)
+                    {
+                        array2[j + 1] = array2[j];
+                        --j;
+                    }
+                    array2[j + 1] = key;
+                    Action action = () => chart2.Series[0].Points.DataBindY(array2);
+                    Invoke(action);
+                    Thread.Sleep(Convert.ToInt32(textBox3.Text));
                 }
-                array2[j + 1] = key;
-                Action action = () => chart2.Series[0].Points.DataBindY(array2);
-                Invoke(action);
-                Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                sw.Stop();
+                Action action5 = () => label3.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                Invoke(action5);
             }
-            sw.Stop();
-            Action action5 = () => label3.Text = sw.ElapsedMilliseconds.ToString() + "ms";
-            Invoke(action5);
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public void InverseBogoSort(object arr1)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-
-            while (!InverseIsSorted())
+            try
             {
-                RandomSwap();
-                Action action = () => chart5.Series[0].Points.DataBindY(array5);
-                Invoke(action);
-                Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                while (!InverseIsSorted())
+                {
+                    RandomSwap();
+                    Action action = () => chart5.Series[0].Points.DataBindY(array5);
+                    Invoke(action);
+                    Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                }
+                sw.Stop();
+                Action action5 = () => label4.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                Invoke(action5);
             }
-            sw.Stop();
-            Action action5 = () => label4.Text = sw.ElapsedMilliseconds.ToString() + "ms";
-            Invoke(action5);
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         public bool InverseIsSorted()
         {
@@ -653,43 +694,50 @@ namespace Laba4
 
         public void InverseShakerSort()
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            for (var i = 0; i < array3.GetLength(0) / 2; i++)
+            try
             {
-                Action action = () => chart3.Series[0].Points.DataBindY(array3);
-                Invoke(action);
-                var swapFlag = false;
-                //проход слева направо
-                for (var j = i; j < array3.GetLength(0) - i - 1; j++)
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                for (var i = 0; i < array3.GetLength(0) / 2; i++)
                 {
-                    if (array3[j] < array3[j + 1])
+                    Action action = () => chart3.Series[0].Points.DataBindY(array3);
+                    Invoke(action);
+                    var swapFlag = false;
+                    //проход слева направо
+                    for (var j = i; j < array3.GetLength(0) - i - 1; j++)
                     {
-                        Swap(ref array3[j], ref array3[j + 1]);
-                        swapFlag = true;
+                        if (array3[j] < array3[j + 1])
+                        {
+                            Swap(ref array3[j], ref array3[j + 1]);
+                            swapFlag = true;
+                        }
                     }
-                }
-                Invoke(action);
-                //проход справа налево
-                for (var j = array3.Length - 2 - i; j > i; j--)
-                {
-                    if (array3[j - 1] < array3[j])
+                    Invoke(action);
+                    //проход справа налево
+                    for (var j = array3.Length - 2 - i; j > i; j--)
                     {
-                        Swap(ref array3[j - 1], ref array3[j]);
-                        swapFlag = true;
+                        if (array3[j - 1] < array3[j])
+                        {
+                            Swap(ref array3[j - 1], ref array3[j]);
+                            swapFlag = true;
+                        }
                     }
+                    Invoke(action);
+                    //если обменов не было выходим
+                    if (!swapFlag)
+                    {
+                        break;
+                    }
+                    Thread.Sleep(Convert.ToInt32(textBox3.Text));
                 }
-                Invoke(action);
-                //если обменов не было выходим
-                if (!swapFlag)
-                {
-                    break;
-                }
-                Thread.Sleep(Convert.ToInt32(textBox3.Text));
+                sw.Stop();
+                Action action1 = () => label7.Text = sw.ElapsedMilliseconds.ToString() + "ms";
+                Invoke(action1);
             }
-            sw.Stop();
-            Action action1 = () => label7.Text = sw.ElapsedMilliseconds.ToString()+"ms";
-            Invoke(action1);
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public int InverseWall(double[] array, int minIndex, int maxIndex)
@@ -711,19 +759,25 @@ namespace Laba4
 
         public double[] InverseQuickSort(double[] array, int minIndex, int maxIndex)
         {
-
-            if (minIndex >= maxIndex)
+            try
             {
-                return array;
-            }
+                if (minIndex >= maxIndex)
+                {
+                    return array;
+                }
 
-            var pivotIndex = InverseWall(array, minIndex, maxIndex);
-            Action action = () => chart4.Series[0].Points.DataBindY(array4);
-            Invoke(action);
-            InverseQuickSort(array, minIndex, pivotIndex - 1);
-            Invoke(action);
-            InverseQuickSort(array, pivotIndex + 1, maxIndex);
-            Invoke(action);
+                var pivotIndex = InverseWall(array, minIndex, maxIndex);
+                Action action = () => chart4.Series[0].Points.DataBindY(array4);
+                Invoke(action);
+                InverseQuickSort(array, minIndex, pivotIndex - 1);
+                Invoke(action);
+                InverseQuickSort(array, pivotIndex + 1, maxIndex);
+                Invoke(action);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             return array;
         }
 
@@ -764,6 +818,12 @@ namespace Laba4
         private void Form1_Load(object sender, EventArgs e)
         {
             textBox3.Text = "0";
+            label1.Text = "";
+            label2.Text = "";
+            label3.Text = "";
+            label4.Text = "";
+            label5.Text = "";
+            label7.Text = "";
         }
     }
 }
